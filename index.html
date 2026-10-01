@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Voz & IA · Feira de Ciências COC</title>
+<meta name="description" content="Fale sua pergunta e ouça a resposta da inteligência artificial. Projeto da Feira de Ciências.">
+<meta name="theme-color" content="#06140c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231fb35f'/%3E%3Cpath d='M8 14v4M12 10v12M16 6v20M20 10v12M24 14v4' stroke='%23052712' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06140c; --s1:#0b2016; --s2:#10301f; --line:#16301f; --line2:#1f4a30;
+  --tx:#f0f5ec; --tx2:#c9d6cc; --mu:#8aa393; --dim:#5d7867;
+  --g:#1fb35f; --g-hi:#34cc75; --g-dk:#0d5a33; --g-lt:#86f0b2;
+  --red:#f0525a; --yel:#f4bd45;
+  --disp:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;height:100%;-webkit-text-size-adjust:100%}
+html.big{font-size:21px}
+body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+[hidden]{display:none!important}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--g-lt);outline-offset:3px}
+.app{height:100dvh;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+.col{width:100%;max-width:42rem;margin:0 auto;padding:0 1.25rem}
+
+/* Topo */
+.top{flex:none;display:flex;align-items:center;justify-content:space-between;gap:.75rem;height:3.5rem;padding:0 1rem 0 1.25rem}
+.brand{display:flex;align-items:center;gap:.65rem;min-width:0}
+.mark{flex:none;width:2rem;height:2rem;border-radius:.6rem;background:var(--g);display:grid;place-items:center}
+.brand b{font-family:var(--disp);font-weight:800;font-size:1.15rem;letter-spacing:-.02em;line-height:1}
+.brand small{display:block;font-size:.7rem;color:var(--mu);margin-top:.15rem;line-height:1}
+.tools{display:flex;gap:.4rem}
+.tb{display:flex;align-items:center;gap:.45rem;height:2.4rem;min-width:2.4rem;padding:0 .7rem;justify-content:center;border-radius:.7rem;
+  border:1px solid var(--line2);font-size:.82rem;font-weight:600;color:var(--tx2);transition:background .15s}
+.tb:hover{background:var(--s1)}
+.tb span{display:none}
+@media (min-width:640px){.tb span{display:inline}}
+
+/* Conteúdo */
+.scroll{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth;overscroll-behavior:contain}
+.hero{padding-top:clamp(1rem,5vh,3.5rem);padding-bottom:1rem}
+.eq{display:flex;align-items:center;gap:.32rem;height:3.6rem;margin-bottom:1.4rem}
+.eq i{display:block;width:.34rem;height:var(--h);border-radius:.2rem;background:var(--g)}
+.eq i:nth-child(3n){background:var(--g-lt)}
+body.listening .eq i{animation:eq .8s ease-in-out infinite alternate;animation-delay:var(--d)}
+@keyframes eq{from{transform:scaleY(.3)}to{transform:scaleY(1.7)}}
+.hero h1{font-family:var(--disp);font-weight:800;font-size:clamp(2.4rem,11vw,3.9rem);line-height:1;letter-spacing:-.04em}
+.hero h1 em{font-style:normal;color:var(--g)}
+.hero p{margin-top:1rem;color:var(--tx2);font-size:1.05rem;max-width:30rem}
+.try{margin-top:1.75rem;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
+.chip{padding:.6rem .95rem;border-radius:2rem;border:1px solid var(--line2);background:var(--s1);font-size:.92rem;font-weight:500;text-align:left;transition:background .15s,border-color .15s}
+.chip:hover,.chip:active{background:var(--s2);border-color:var(--g-dk)}
+
+/* Perguntas e respostas */
+.list{padding:.5rem 0 1.5rem}
+.qa{padding:1.25rem 0;border-top:1px solid var(--line);animation:in .22s ease-out}
+.qa:first-child{border-top:0}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.lb{display:flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mu)}
+.lb::before{content:"";width:.5rem;height:.5rem;border-radius:50%;border:2px solid var(--g)}
+.lb.ia{color:var(--g-lt);margin-top:1.05rem}
+.lb.ia::before{background:var(--g);border-color:var(--g)}
+.lb time{font-weight:500;letter-spacing:0;color:var(--dim)}
+.q{font-family:var(--disp);font-weight:700;font-size:1.3rem;line-height:1.25;letter-spacing:-.02em;margin-top:.4rem;overflow-wrap:anywhere}
+.a{margin-top:.4rem;font-size:1.05rem;line-height:1.65;color:var(--tx2)}
+.a p{overflow-wrap:anywhere}.a p+p{margin-top:.8rem}
+.qa.err .a{color:#f6a9ad}
+.dots span{display:inline-block;width:.4rem;height:.4rem;margin-right:.3rem;border-radius:50%;background:var(--g);opacity:.3;animation:bl 1.1s infinite}
+.dots span:nth-child(2){animation-delay:.18s}.dots span:nth-child(3){animation-delay:.36s}
+@keyframes bl{40%{opacity:1}}
+.say{display:inline-flex;align-items:center;gap:.45rem;margin-top:.8rem;height:2.2rem;padding:0 .85rem;border-radius:2rem;border:1px solid var(--line2);
+  font-size:.82rem;font-weight:600;color:var(--tx2);transition:background .15s}
+.say:hover{background:var(--s1)}
+.say.on{color:var(--g-lt);border-color:var(--g-dk);background:var(--s1)}
+
+/* Base de controles */
+.dock{flex:none;background:var(--bg);border-top:1px solid var(--line);padding:.7rem 0 calc(.7rem + env(safe-area-inset-bottom))}
+.status{display:flex;align-items:center;gap:.5rem;min-height:1.4rem;font-size:.85rem;font-weight:500;color:var(--g-lt);justify-content:center}
+.status i{flex:none;width:.5rem;height:.5rem;border-radius:50%;background:currentColor}
+.status[data-s="listening"]{color:var(--red)}
+.status[data-s="listening"] i{animation:pl 1.1s infinite}
+.status[data-s="busy"]{color:var(--yel)}
+.status[data-s="error"]{color:var(--red)}
+@keyframes pl{50%{opacity:.3}}
+.sr{display:flex;align-items:center;gap:.75rem;margin-left:auto}
+body.textmode .status{justify-content:flex-start}
+.cnt{color:var(--dim);font-size:.78rem;font-variant-numeric:tabular-nums;font-weight:400}
+.link{font-size:.8rem;font-weight:600;color:var(--tx2);text-decoration:underline;text-underline-offset:3px}
+.live{margin:.2rem auto 0;max-width:30rem;text-align:center;font-size:1rem;font-style:italic;color:var(--tx);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vrow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin-top:.6rem}
+.sd{display:flex;flex-direction:column;align-items:center;gap:.3rem;justify-self:center;padding:.4rem .6rem;border-radius:.8rem;font-size:.72rem;font-weight:600;color:var(--mu);transition:color .15s}
+.sd:hover{color:var(--tx)}
+.sd[aria-pressed="true"]{color:var(--g-lt)}
+.sd .ic{display:grid;place-items:center;width:2.6rem;height:2.6rem;border-radius:50%;border:1px solid var(--line2)}
+.sd[aria-pressed="true"] .ic{background:var(--g-dk);border-color:var(--g-dk);color:#fff}
+.mic{width:5rem;height:5rem;border-radius:50%;background:var(--g);color:#052712;display:grid;place-items:center;transition:background .15s,transform .1s}
+.mic:hover{background:var(--g-hi)}
+.mic:active{transform:scale(.95)}
+.mic.rec{background:var(--red);color:#fff;animation:ring 1.4s infinite}
+@keyframes ring{from{box-shadow:0 0 0 0 rgba(240,82,90,.5)}to{box-shadow:0 0 0 1.1rem rgba(240,82,90,0)}}
+.trow{display:flex;align-items:flex-end;gap:.5rem;margin-top:.3rem;padding:.4rem;background:var(--s1);border:1px solid var(--line2);border-radius:1.4rem;transition:border-color .15s}
+.trow:focus-within{border-color:var(--g)}
+.mini,.send{flex:none;width:2.9rem;height:2.9rem;border-radius:50%;display:grid;place-items:center}
+.mini{background:var(--g);color:#052712}
+.mini.rec{background:var(--red);color:#fff;animation:ring 1.4s infinite}
+.send{background:var(--g-dk);color:#fff;transition:opacity .15s,background .15s}
+.send:not(:disabled):hover{background:var(--g)}
+.send:disabled{opacity:.35;cursor:not-allowed}
+textarea{flex:1;min-width:0;resize:none;background:transparent;border:0;outline:0;color:var(--tx);font:inherit;font-size:1.05rem;line-height:1.4;padding:.75rem .2rem;max-height:7.5rem}
+textarea::placeholder{color:var(--dim)}
+.hint{margin-top:.5rem;text-align:center;font-size:.7rem;color:var(--dim)}
+body.textmode .hint{display:none}
+
+/* Painel "Como funciona" */
+dialog{margin:auto;width:min(36rem,calc(100% - 2rem));max-height:88dvh;overflow-y:auto;background:var(--s1);color:var(--tx);border:1px solid var(--line2);border-radius:1.3rem;padding:0}
+dialog::backdrop{background:rgba(1,7,3,.75)}
+.sh{padding:1.4rem 1.4rem 1.6rem}
+.sh-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.sh h2{font-family:var(--disp);font-size:1.7rem;font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.sh .sub{color:var(--mu);font-size:.92rem;margin-top:.35rem}
+.x{flex:none;width:2.4rem;height:2.4rem;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center}
+.steps{list-style:none;counter-reset:n;margin-top:1.25rem;display:grid;gap:.9rem}
+.steps li{counter-increment:n;display:grid;grid-template-columns:2rem 1fr;gap:.8rem}
+.steps li::before{content:counter(n);display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:var(--g);color:#052712;font-weight:800;font-size:.85rem;font-family:var(--disp)}
+.steps b{display:block;font-size:.98rem}
+.steps span{font-size:.88rem;color:var(--tx2)}
+.facts{margin-top:1.4rem;border:1px solid var(--line);border-radius:.9rem;padding:.3rem 1rem}
+.facts div{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.facts div:last-child{border:0}
+.facts dt{color:var(--mu)}.facts dd{font-weight:600}
+.facts dd.ok{color:var(--g-lt)}.facts dd.bad{color:var(--red)}
+.big-btn{margin-top:1rem;width:100%;display:flex;justify-content:space-between;align-items:center;padding:.85rem 1rem;border:1px solid var(--line2);border-radius:.9rem;font-weight:600;font-size:.92rem}
+.big-btn[aria-pressed="true"]{border-color:var(--g-dk);background:var(--s2);color:var(--g-lt)}
+.big-btn small{font-weight:500;color:var(--mu)}
+.note{margin-top:1rem;font-size:.82rem;color:var(--mu)}
+
+@media (max-width:640px){
+  dialog{margin:auto 0 0;width:100%;max-width:none;border-radius:1.3rem 1.3rem 0 0;max-height:92dvh;border-bottom:0}
+  .col{padding:0 1.1rem}
+  .q{font-size:1.2rem}
+}
+@media (max-height:560px){.eq{display:none}.hero p{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#052712" stroke-width="2.8" stroke-linecap="round"><path d="M5 10v4M9 6v12M13 3v18M17 7v10M21 10v4"/></svg></span>
+      <div><b>Voz &amp; IA</b><small>Feira de Ciências · COC</small></div>
+    </div>
+    <div class="tools">
+      <button id="btnNew" class="tb" title="Nova conversa" aria-label="Nova conversa">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Nova</span>
+      </button>
+      <button id="btnInfo" class="tb" title="Como funciona" aria-label="Como funciona">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg><span>Como funciona</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="scroll" class="scroll"><div class="col">
+    <section id="hero" class="hero">
+      <div class="eq" id="eq" aria-hidden="true"></div>
+      <h1>Pergunte em <em>voz alta.</em></h1>
+      <p>Toque no microfone, faça sua pergunta e ouça a resposta da inteligência artificial.</p>
+      <p class="try">Experimente</p>
+      <div class="chips">
+        <button class="chip" data-q="O que é inteligência artificial? Explique de forma simples.">O que é inteligência artificial?</button>
+        <button class="chip" data-q="Como o computador transforma a minha fala em texto?">Como o computador entende minha voz?</button>
+        <button class="chip" data-q="Como as plantas produzem o próprio alimento? Explique a fotossíntese.">Como funciona a fotossíntese?</button>
+        <button class="chip" data-q="Me conte uma curiosidade científica que surpreenda alunos e pais.">Conte uma curiosidade</button>
+      </div>
+    </section>
+    <div id="list" class="list" aria-live="polite"></div>
+  </div></div>
+
+  <footer class="dock"><div class="col">
+    <div id="status" class="status" data-s="ready">
+      <i></i><span id="stx">Toque no microfone e fale</span>
+      <span class="sr" id="sr" hidden><span id="cnt" class="cnt">0/500</span><button id="btnBack" class="link" type="button">Usar só voz</button></span>
+    </div>
+    <p id="live" class="live" hidden></p>
+
+    <div id="vrow" class="vrow">
+      <button id="btnText" class="sd" type="button">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></span>Digitar
+      </button>
+      <button id="mic" class="mic" type="button" aria-label="Falar pergunta">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg>
+      </button>
+      <button id="btnVoice" class="sd" type="button" aria-pressed="false" title="Ler as respostas em voz alta">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg></span><span id="voiceLb">Voz da IA</span>
+      </button>
+    </div>
+
+    <div id="trow" class="trow" hidden>
+      <button id="mini" class="mini" type="button" aria-label="Falar pergunta">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg>
+      </button>
+      <textarea id="in" rows="1" maxlength="500" autocomplete="off" enterkeyhint="send" placeholder="Digite sua pergunta…" aria-label="Sua pergunta"></textarea>
+      <button id="send" class="send" type="button" aria-label="Enviar pergunta" disabled>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
+    <p class="hint">A IA pode errar. Confira informações importantes e não envie dados pessoais.</p>
+  </div></footer>
+</div>
+
+<dialog id="sheet" aria-labelledby="shT"><div class="sh">
+  <div class="sh-top">
+    <div><h2 id="shT">Como funciona</h2><p class="sub">Do microfone até a resposta, em cinco passos.</p></div>
+    <button id="btnClose" class="x" aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <ol class="steps">
+    <li><div><b>Você fala</b><span>O navegador reconhece sua voz em português do Brasil.</span></div></li>
+    <li><div><b>A fala vira texto</b><span>Você vê a transcrição na tela, ao vivo.</span></div></li>
+    <li><div><b>Envio seguro</b><span>A pergunta vai a um servidor do projeto. A chave da IA fica guardada lá e nunca chega ao seu aparelho.</span></div></li>
+    <li><div><b>A IA pensa</b><span>O servidor consulta o Gemini 2.5 Flash, do Google, com o contexto das últimas mensagens.</span></div></li>
+    <li><div><b>Você lê e ouve</b><span>A resposta aparece na tela e pode ser lida em voz alta.</span></div></li>
+  </ol>
+  <dl class="facts">
+    <div><dt>Mensagens</dt><dd id="nMsg">0</dd></div>
+    <div><dt>Idioma</dt><dd>Português (pt-BR)</dd></div>
+    <div><dt>Modelo</dt><dd>Gemini 2.5 Flash</dd></div>
+    <div><dt>Conexão</dt><dd id="conn" class="ok">Online</dd></div>
+  </dl>
+  <button id="btnBig" class="big-btn" aria-pressed="false"><span>Modo telão <small>letras maiores para o projetor</small></span><span id="bigSt">Desligado</span></button>
+  <p class="note">Respostas de IA podem conter erros. Para trabalhos escolares, confirme em fontes confiáveis.</p>
+</div></dialog>
+
+<script>
+(() => {
+  'use strict';
+  const MAX = 500, HIST = 8, COOLDOWN = 2000;
+  const ENDPOINT = '/.netlify/functions/chat';
+  // Aberto direto no computador (file://) não existe servidor: a resposta é simulada só para visualizar.
+  const DEMO = location.protocol === 'file:';
+  const DEMO_REPLY = 'Esta é uma resposta de demonstração, só para você ver como a tela fica.\n\nDepois do deploy no Netlify, aqui aparecerá a resposta real do Gemini 2.5 Flash, curta e explicada de forma simples.';
+  const $ = (s) => document.querySelector(s);
+
+  let history = [], busy = false, listening = false, voiceOn = false, rec = null, n = 0, lastSend = 0, textMode = false;
+
+  const ICON_SPK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
+  const ICON_STOP = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>';
+
+  /* Barras de som da tela inicial */
+  const eq = $('#eq');
+  [30, 55, 80, 45, 100, 65, 90, 40, 70, 50, 25].forEach((h, i) => {
+    const b = document.createElement('i');
+    b.style.setProperty('--h', h + '%');
+    b.style.setProperty('--d', (i * 70 % 500) + 'ms');
+    eq.appendChild(b);
+  });
+
+  /* ---------- Utilidades ---------- */
+  const setStatus = (s, t) => { $('#status').dataset.s = s; $('#stx').textContent = t; };
+  const READY = () => setStatus('ready', textMode ? 'Digite ou toque no microfone' : 'Toque no microfone e fale');
+  const now = () => new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const toBottom = () => { const s = $('#scroll'); s.scrollTop = s.scrollHeight; };
+
+  function fill(box, text) {
+    box.textContent = '';
+    text.split(/\n{2,}/).forEach((par) => {
+      const p = document.createElement('p');
+      p.textContent = par.replace(/\*\*/g, '').replace(/^\s*[*-]\s+/gm, '• ').trim();
+      box.appendChild(p);
+    });
+  }
+
+  function addQA(question) {
+    $('#hero').hidden = true;
+    const qa = document.createElement('article');
+    qa.className = 'qa';
+    const l1 = document.createElement('div'); l1.className = 'lb';
+    l1.append('Você ');
+    const t1 = document.createElement('time'); t1.textContent = '· ' + now(); l1.appendChild(t1);
+    const q = document.createElement('h2'); q.className = 'q'; q.textContent = question;
+    const l2 = document.createElement('div'); l2.className = 'lb ia';
+    l2.append('Assistente IA ');
+    const t2 = document.createElement('time'); l2.appendChild(t2);
+    const a = document.createElement('div'); a.className = 'a';
+    a.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+    qa.append(l1, q, l2, a);
+    $('#list').appendChild(qa);
+    toBottom();
+    return { qa, a, t2 };
+  }
+
+  const bump = () => { n += 1; $('#nMsg').textContent = String(n); };
+
+  function updateComposer() {
+    const el = $('#in');
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    $('#cnt').textContent = `${el.value.length}/${MAX}`;
+    $('#send').disabled = busy || !el.value.trim();
+  }
+
+  /* ---------- Modo digitar / voz ---------- */
+  function setMode(text) {
+    textMode = text;
+    document.body.classList.toggle('textmode', text);
+    $('#vrow').hidden = text; $('#trow').hidden = !text; $('#sr').hidden = !text;
+    if (text) { $('#in').focus(); updateComposer(); }
+    if (!listening && !busy) READY();
+    setTimeout(toBottom, 50);
+  }
+  $('#btnText').addEventListener('click', () => setMode(true));
+  $('#btnBack').addEventListener('click', () => setMode(false));
+  $('#in').addEventListener('focus', () => setTimeout(toBottom, 300));
+
+  /* ---------- Voz da IA (síntese) ---------- */
+  const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
+  let ptVoice = null, speaking = null, sid = 0;
+  const pickVoice = () => {
+    if (!synth) return;
+    const v = synth.getVoices();
+    ptVoice = v.find((x) => x.lang === 'pt-BR') || v.find((x) => (x.lang || '').startsWith('pt')) || null;
+  };
+  if (synth) { pickVoice(); synth.addEventListener('voiceschanged', pickVoice); }
+
+  function setSpeaking(btn) {
+    if (speaking) { speaking.classList.remove('on'); speaking.innerHTML = ICON_SPK + '<span>Ouvir</span>'; }
+    speaking = btn || null;
+    if (speaking) { speaking.classList.add('on'); speaking.innerHTML = ICON_STOP + '<span>Parar</span>'; }
+  }
+  function stopSpeak() { if (!synth) return; sid++; synth.cancel(); setSpeaking(null); }
+  function speak(text, btn) {
+    if (!synth) { setStatus('error', 'Este navegador não lê respostas em voz.'); return; }
+    stopSpeak();
+    const id = ++sid;
+    setSpeaking(btn);
+    const parts = (text.replace(/\*\*/g, '').match(/[^.!?\n]+[.!?]*/g) || [text]).map((s) => s.trim()).filter(Boolean);
+    parts.forEach((p, i) => {
+      const u = new SpeechSynthesisUtterance(p);
+      u.lang = 'pt-BR'; if (ptVoice) u.voice = ptVoice;
+      if (i === parts.length - 1) u.onend = u.onerror = () => { if (id === sid) setSpeaking(null); };
+      synth.speak(u);
+    });
+  }
+  function addSay(qa, text) {
+    const b = document.createElement('button');
+    b.className = 'say'; b.type = 'button';
+    b.innerHTML = ICON_SPK + '<span>Ouvir</span>';
+    b.addEventListener('click', () => (speaking === b ? stopSpeak() : speak(text, b)));
+    qa.appendChild(b);
+    return b;
+  }
+
+  $('#btnVoice').addEventListener('click', (e) => {
+    if (!synth) { setStatus('error', 'Este navegador não lê respostas em voz.'); return; }
+    voiceOn = !voiceOn;
+    e.currentTarget.setAttribute('aria-pressed', String(voiceOn));
+    $('#voiceLb').textContent = voiceOn ? 'Voz ligada' : 'Voz da IA';
+    if (!voiceOn) stopSpeak();
+  });
+
+  /* ---------- Painel e telão ---------- */
+  const sheet = $('#sheet');
+  $('#btnInfo').addEventListener('click', () => sheet.showModal());
+  $('#btnClose').addEventListener('click', () => sheet.close());
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.close(); });
+  $('#btnBig').addEventListener('click', (e) => {
+    const on = document.documentElement.classList.toggle('big');
+    e.currentTarget.setAttribute('aria-pressed', String(on));
+    $('#bigSt').textContent = on ? 'Ligado' : 'Desligado';
+  });
+  $('#btnNew').addEventListener('click', () => {
+    if (rec && listening) rec.abort();
+    stopSpeak();
+    history = []; n = 0; $('#nMsg').textContent = '0';
+    $('#list').textContent = ''; $('#hero').hidden = false; $('#scroll').scrollTop = 0;
+    $('#in').value = ''; updateComposer(); setMode(false); READY();
+  });
+
+  /* ---------- Microfone ---------- */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const MIC_ERR = {
+    'not-allowed': 'Microfone bloqueado. Permita o acesso nas configurações do navegador e tente de novo.',
+    'service-not-allowed': 'O microfone não está disponível neste navegador.',
+    'no-speech': 'Não ouvi nada. Toque no microfone e fale de novo.',
+    'audio-capture': 'Nenhum microfone foi encontrado.',
+    'network': 'Falha de rede no reconhecimento de voz. Verifique a internet.',
+    'language-not-supported': 'O português não é suportado neste navegador.'
+  };
+
+  function setRec(on) {
+    listening = on;
+    document.body.classList.toggle('listening', on);
+    ['#mic', '#mini'].forEach((s) => { $(s).classList.toggle('rec', on); $(s).setAttribute('aria-label', on ? 'Parar de ouvir' : 'Falar pergunta'); });
+    if (!on) $('#live').hidden = true;
+  }
+
+  function listen() {
+    if (!SR) { setStatus('error', 'Este navegador não reconhece voz. Use o Google Chrome ou digite.'); return; }
+    if (busy) return;
+    stopSpeak();
+    let finalText = '', err = '';
+    rec = new SR();
+    rec.lang = 'pt-BR'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+    rec.onstart = () => { setRec(true); setStatus('listening', 'Ouvindo… fale agora'); };
+    rec.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t; else interim += t;
+      }
+      const all = (finalText + interim).slice(0, MAX);
+      $('#in').value = all; updateComposer();
+      if (!textMode) { $('#live').textContent = '“' + all + '”'; $('#live').hidden = false; }
+    };
+    rec.onerror = (e) => { err = e.error; };
+    rec.onend = () => {
+      setRec(false);
+      if (err === 'aborted') return READY();
+      if (err) return setStatus('error', MIC_ERR[err] || 'Não foi possível usar o microfone.');
+      if (finalText.trim()) send(); else READY();
+    };
+    try { rec.start(); } catch (_) { setStatus('error', 'Não foi possível iniciar o microfone. Tente novamente.'); }
+  }
+  const micClick = () => (listening && rec ? rec.stop() : listen());
+  $('#mic').addEventListener('click', micClick);
+  $('#mini').addEventListener('click', micClick);
+
+  /* ---------- Envio ---------- */
+  async function send(override) {
+    const text = (override ?? $('#in').value).trim().slice(0, MAX);
+    if (!text || busy) return;
+    if (Date.now() - lastSend < COOLDOWN) { setStatus('busy', 'Um instante… aguarde para enviar outra pergunta.'); return; }
+    lastSend = Date.now();
+    busy = true; stopSpeak();
+    $('#in').value = ''; updateComposer();
+    bump();
+    const { qa, a, t2 } = addQA(text);
+    setStatus('busy', 'A IA está pensando…');
+
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 30000);
+    try {
+      let ok = true, data = {};
+      if (DEMO) { await new Promise((r) => setTimeout(r, 1200)); data = { reply: DEMO_REPLY }; }
+      else {
+        const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, history: history.slice(-HIST) }), signal: ctrl.signal });
+        ok = res.ok;
+        try { data = await res.json(); } catch (_) { /* sem JSON */ }
+      }
+      if (!ok || !data.reply) throw new Error(data.error || 'Não consegui responder agora. Tente novamente.');
+      fill(a, data.reply);
+      t2.textContent = '· ' + now();
+      const btn = addSay(qa, data.reply);
+      history.push({ role: 'user', text }, { role: 'model', text: data.reply });
+      history = history.slice(-HIST);
+      bump(); setConn(true); READY();
+      if (voiceOn) speak(data.reply, btn);
+    } catch (e) {
+      const off = !navigator.onLine;
+      const msg = e.name === 'AbortError' ? 'A resposta demorou demais. Tente novamente em instantes.'
+        : off ? 'Você está sem internet. Verifique a conexão e tente de novo.'
+        : e instanceof TypeError ? 'Não foi possível falar com o servidor. Tente novamente.' : e.message;
+      qa.classList.add('err');
+      fill(a, msg);
+      $('#in').value = text;             // devolve a pergunta para reenviar
+      setMode(true); updateComposer();
+      setConn(!off); setStatus('error', msg);
+    } finally {
+      clearTimeout(timer); busy = false; updateComposer(); toBottom();
+    }
+  }
+
+  function setConn(on) {
+    $('#conn').textContent = on ? 'Online' : 'Offline';
+    $('#conn').className = on ? 'ok' : 'bad';
+  }
+  addEventListener('online', () => setConn(true));
+  addEventListener('offline', () => setConn(false));
+
+  /* ---------- Eventos ---------- */
+  $('#in').addEventListener('input', updateComposer);
+  $('#in').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+  $('#send').addEventListener('click', () => send());
+  document.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => send(c.dataset.q)));
+
+  if (!SR) setStatus('error', 'Este navegador não reconhece voz. Use o Google Chrome ou digite.');
+  updateComposer();
+})();
+</script>
+</body>
+</html>

@@ -5,14 +5,15 @@
  * Para forçar um modelo, crie a variável de ambiente GEMINI_MODEL no Netlify
  * (ex.: gemini-3.5-flash). Ela passa a ser a primeira da lista.
  */
-const DEFAULT_MODELS = ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash'];
+const DEFAULT_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash'];
 const MODELS = [process.env.GEMINI_MODEL, ...DEFAULT_MODELS].filter(Boolean)
   .filter((m, i, arr) => arr.indexOf(m) === i);
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const MAX_CHARS = 500;
 const HISTORY_LIMIT = 8;
-const TOTAL_MS = 9000; // a função do Netlify é cortada perto de 10 s
+const TOTAL_MS = 9000;  // a função do Netlify é cortada perto de 10 s
+const PER_MODEL_MS = 5000; // cada modelo (menos o último) tem no máximo isso, para sobrar tempo ao próximo
 
 const SYSTEM_PROMPT = [
   'Você é o assistente de IA da Feira de Ciências da escola, cujo tema é "IA e Escrita por Voz".',
@@ -39,7 +40,7 @@ function thinkingFor(model) {
 }
 
 function buildBody(model, contents, withThinking) {
-  const generationConfig = { temperature: 0.7, maxOutputTokens: 1500 };
+  const generationConfig = { temperature: 0.7, maxOutputTokens: 900 };
   const thinking = withThinking ? thinkingFor(model) : null;
   if (thinking) generationConfig.thinkingConfig = thinking;
   return JSON.stringify({
@@ -129,7 +130,8 @@ exports.handler = async (event) => {
 
       let r;
       try {
-        r = await callOnce(model, buildBody(model, contents, withThinking), apiKey, left());
+        const isLast = MODELS.indexOf(model) === MODELS.length - 1;
+        r = await callOnce(model, buildBody(model, contents, withThinking), apiKey, isLast ? left() : Math.min(left(), PER_MODEL_MS));
       } catch (err) {
         console.error(`[${model}] falha de rede/tempo:`, err.name || err);
         lastStatus = err.name === 'AbortError' ? 504 : 502;

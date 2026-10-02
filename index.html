@@ -226,13 +226,13 @@ dialog::backdrop{background:rgba(1,7,3,.75)}
     <li><div><b>Você fala</b><span>O navegador reconhece sua voz em português do Brasil.</span></div></li>
     <li><div><b>A fala vira texto</b><span>Você vê a transcrição na tela, ao vivo.</span></div></li>
     <li><div><b>Envio seguro</b><span>A pergunta vai a um servidor do projeto. A chave da IA fica guardada lá e nunca chega ao seu aparelho.</span></div></li>
-    <li><div><b>A IA pensa</b><span>O servidor consulta o Gemini 2.5 Flash, do Google, com o contexto das últimas mensagens.</span></div></li>
+    <li><div><b>A IA pensa</b><span>O servidor consulta o Gemini, do Google, com o contexto das últimas mensagens.</span></div></li>
     <li><div><b>Você lê e ouve</b><span>A resposta aparece na tela e pode ser lida em voz alta.</span></div></li>
   </ol>
   <dl class="facts">
     <div><dt>Mensagens</dt><dd id="nMsg">0</dd></div>
     <div><dt>Idioma</dt><dd>Português (pt-BR)</dd></div>
-    <div><dt>Modelo</dt><dd>Gemini 2.5 Flash</dd></div>
+    <div><dt>Modelo</dt><dd>Google Gemini</dd></div>
     <div><dt>Conexão</dt><dd id="conn" class="ok">Online</dd></div>
   </dl>
   <button id="btnBig" class="big-btn" aria-pressed="false"><span>Modo telão <small>letras maiores para o projetor</small></span><span id="bigSt">Desligado</span></button>
@@ -246,7 +246,7 @@ dialog::backdrop{background:rgba(1,7,3,.75)}
   const ENDPOINT = '/.netlify/functions/chat';
   // Aberto direto no computador (file://) não existe servidor: a resposta é simulada só para visualizar.
   const DEMO = location.protocol === 'file:';
-  const DEMO_REPLY = 'Esta é uma resposta de demonstração, só para você ver como a tela fica.\n\nDepois do deploy no Netlify, aqui aparecerá a resposta real do Gemini 2.5 Flash, curta e explicada de forma simples.';
+  const DEMO_REPLY = 'Esta é uma resposta de demonstração, só para você ver como a tela fica.\n\nDepois do deploy no Netlify, aqui aparecerá a resposta real do Gemini, curta e explicada de forma simples.';
   const $ = (s) => document.querySelector(s);
 
   let history = [], busy = false, listening = false, voiceOn = false, rec = null, n = 0, lastSend = 0, textMode = false;
@@ -446,7 +446,7 @@ dialog::backdrop{background:rgba(1,7,3,.75)}
     setStatus('busy', 'A IA está pensando…');
 
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 30000);
+    const timer = setTimeout(() => ctrl.abort(), 15000);
     try {
       let ok = true, data = {};
       if (DEMO) { await new Promise((r) => setTimeout(r, 1200)); data = { reply: DEMO_REPLY }; }
